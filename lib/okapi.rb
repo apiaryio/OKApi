@@ -2,6 +2,7 @@
 require 'rubygems'
 require "okapi/version"
 require "okapi/config"
+require "okapi/output"
 require "okapi/apiary_connector"
 require "okapi/resources"
 require "okapi/spec_parser"

@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.version       = Apiary::Okapi::VERSION
   spec.authors       = ["Tu1ly"]
   spec.email         = ["tully@apiary.io"]
-  spec.description   = %q{Apiary.io resource tester}
-  spec.summary       = %q{Apiary.io resource tester}
+  spec.description   = %q{Apiary.io API tester - OKApi allows you to test if your documentation in Apiary Blueprint match your API}
+  spec.summary       = %q{Apiary.io API tester - OKApi allows you to test if your documentation in Apiary Blueprint match your API}
   spec.homepage      = "http://apiary.io"
   spec.license       = "MIT"
 
@@ -20,6 +20,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "json"
-  spec.add_dependency "net/http"
-  spec.add_dependency "uri"
+  spec.add_dependency "rest-client"
 end

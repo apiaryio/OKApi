@@ -36,8 +36,8 @@ module Apiary
           splited = res.split(' ',3)
           begin
             splited[2] = JSON.parse splited[2] if splited[2]
-          rescue
-            raise Exception, 'can not parse parameters for resource:' + splited[0]
+          rescue Exception => e
+            raise Exception, 'can not parse parameters for resource:' + res + "(#{e})"
           end
           out = {
             'resource' => splited[1],

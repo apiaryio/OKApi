@@ -1,24 +1,12 @@
-# ApiaryTest
-
-TODO: Write a gem description
+# OKApi
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'apiary_test'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install apiary_test
+    $ gem install okapi
 
 ## Usage
 
-TODO: Write usage instructions here
+    $ okapi help
 
 ## Contributing
 

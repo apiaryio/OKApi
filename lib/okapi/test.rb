@@ -8,7 +8,7 @@ module Apiary
         @blueprint_path = blueprint_path || BLUEPRINT_PATH
         @test_spec_path = test_spec_path || TEST_SPEC_PATH
         @test_url       = test_url || TEST_URL
-        @output         = output || OUTPUT
+        @output_format         = output || OUTPUT
         @apiary_url     = apiary_url || APIARY_URL
         @req_path       = GET_REQUESTS_PATH
         @res_path       = GET_RESULTS_PATH
@@ -16,30 +16,34 @@ module Apiary
         @output = []
         @resources = []
         @error = nil
+        
       end
 
-      def test
+      def run
+        get_output(method(:test))
+      end
+
+      def get_output(test)
         begin
-          prepare()
-          if not @resources.empty?
-            get_responses
-            evaluate
-          end
-        #change to exception !!!!
-        rescue LoadError => e
+          test.call()
+        #change to Exception !!!!
+        #rescue LoadError => e
+        rescue Exception => e
           @error = e
           #p @error
         end
-        get_output
-        p '////////////////////////***********************'
-        @resources.each { |item|
-          p '---'
-          p item.validation_result.status
-          p item.response.validation_result.status
-          p item
 
-        }
+        Apiary::Okapi::Output.get(@output_format, @resources, @error)
+      end
 
+      def test
+        prepare()
+        if not @resources.empty?
+          get_responses
+          evaluate
+        else
+          raise Exception, 'No resources provided'
+        end
       end
 
       def prepare
@@ -50,7 +54,7 @@ module Apiary
         raise Exception, 'Can not get request data from apiary ' + data[:error] || '' if data[:error] or data[:resp].code.to_i != 200
          
         data[:data].each do |res|
-          raise Exception, 'Resource error "' + res['error'] + '" for resource ' + res["uri"]  if res['error']
+          raise Exception, 'Resource error "' + res['error'] + '" for resource "' + res["method"] + ' ' + res["uri"]  + '"' if res['error']
 
           resources.each do |resource|
             if resource.uri == res["uri"] and resource.method == res["method"]
@@ -115,11 +119,7 @@ module Apiary
 
           }
         }
-      end
-
-      def get_output
-        p @output
-      end
+      end      
 
       def parse_test_spec(test_spec)
         Apiary::Okapi::Parser.new(test_spec).resources
