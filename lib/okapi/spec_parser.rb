@@ -26,7 +26,7 @@ module Apiary
       def read_file(path)
         @data = []
         File.open(path).each do |line|
-          @data << line
+          @data << line if line.strip != ""
         end
         @data
       end
@@ -34,8 +34,9 @@ module Apiary
       def parse_data
         @data.each { |res|
           splited = res.split(' ',3)
+
           begin
-            splited[2] = JSON.parse splited[2] if splited[2]
+            splited[2] = JSON.parse splited[2] if splited[2] and splited[2] != ''
           rescue Exception => e
             raise Exception, 'can not parse parameters for resource:' + res + "(#{e})"
           end

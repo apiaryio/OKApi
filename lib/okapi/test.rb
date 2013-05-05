@@ -51,7 +51,7 @@ module Apiary
         
         data = get_requests_spec(resources)
 
-        raise Exception, 'Can not get request data from apiary ' + data[:error] || '' if data[:error] or data[:resp].code.to_i != 200
+        raise Exception, 'Can not get request data from Apiary: ' + data[:error]  || '' if data[:error] or data[:resp].code.to_i != 200
          
         data[:data].each do |res|
           raise Exception, 'Resource error "' + res['error'] + '" for resource "' + res["method"] + ' ' + res["uri"]  + '"' if res['error']
@@ -85,7 +85,7 @@ module Apiary
 
             resource.response =  Apiary::Okapi::Response.new(response.code, raw_headers, response.body)
           rescue Exception => e
-            raise Exception 'Can not get response for:' + params
+            raise Exception, 'Can not get response for: ' + params.to_json + ' (' + e.to_s + ')'
           end
           }
 
