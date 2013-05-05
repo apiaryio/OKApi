@@ -71,12 +71,12 @@ module Apiary
               res << result.schema_res["errors"][i.to_s]["message"]
             }
           else
-            if not result.header_pass
-              res << 'Headers does not match'
-            end
             if not result.body_pass
               res << 'Body does not match'
             end
+          end
+          if not result.header_pass
+            res << 'Headers does not match'
           end
           res
         end

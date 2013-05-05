@@ -22,9 +22,11 @@ GET /shopping-cart/{id}
 Save new products in your shopping cart
 POST /shopping-cart/{id2}
 > Content-Type: application/json
+> CCC: aaa
 { "product":"1AB23ORM", "quantity": 2 }
 < 201
 < Content-Type: application/json
+< CCC: aaa
 { "status": "created", "url": "/shopping-cart/2" }
 
 -- Payment Resources --
