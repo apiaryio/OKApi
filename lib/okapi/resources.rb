@@ -37,24 +37,6 @@ module Apiary
       end
 
       def get_status
-#        p '@error and @headerPass and ((@schema and  @schemaPass) or (not @schema and @bodyPass))'
-#
-#        p @error
-#        p @header_pass
-#        p @schemaRes
-#        p schema
-#        p schema_pass
-#        p @body_pass
-#        p '#'
-#        p (not @error and @header_pass and ((schema and  schema_pass) or (not schema and @body_pass)))
-#        p (@header_pass and ((schema and  schema_pass) or (not schema and @body_pass)))
-#        p (((schema and  schema_pass) or (not schema and @body_pass)))
-#        p (((schema and  schema_pass)))
-#        p (((not schema and @bodyPass)))
-#        p (not @error)
-#        p '----'
-#        p @body_diff
-#        p @header_diff
         return true if not @error and @header_pass and ((schema and  schema_pass) or (not schema and @body_pass))
         return false
       end

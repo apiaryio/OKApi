@@ -19,20 +19,13 @@ module Apiary
         
       end
 
-      def run
-        get_output(method(:test))
-      end
-
-      def get_output(test)
+      def run(test)
         begin
-          test.call()
-        #change to Exception !!!!
-        #rescue LoadError => e
+          test()
         rescue Exception => e
           @error = e
-          #p @error
         end
-
+        
         Apiary::Okapi::Output.get(@output_format, @resources, @error)
       end
 
