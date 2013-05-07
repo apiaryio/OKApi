@@ -21,7 +21,7 @@ module Apiary
         puts "\t-u, --test_url              url to test (default: " + TEST_URL + ")"
         puts "\t-a, --apiary                apiary url  (default: " + APIARY_URL + ")"
         puts "\t-s, --config                config file  (default: " + CONFIG_PATH + ")"
-        puts "\t-p, --params                prints used parameters
+        puts "\t-p, --params                prints used parameters"
         puts "\n"
         puts "\thelp                        Show this help"
         puts "\n"

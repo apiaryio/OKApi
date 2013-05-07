@@ -9,13 +9,13 @@ module Apiary
       def initialize(args)
         case args.first
           when 'help'
-            puts Apiary::Okapi::Help.show
+            Apiary::Okapi::Help.show
             exit 0
           when 'version'
             puts VERSION
             exit 0
           when 'okapi'
-            puts Apiary::Okapi::Help.okapi
+            Apiary::Okapi::Help.okapi
             exit 0
           else
             parse_options!(args)
