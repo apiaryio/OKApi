@@ -7,6 +7,11 @@ module Apiary
      class Tap < Apiary::Okapi::Outputs::BaseOutput
 
        def get
+         get_int
+         puts "\n\n"
+       end
+       
+       def get_int
          puts "TAP version 13"
          puts "1..#{@results[:count].to_s}"
          if @results[:give_up]
@@ -23,7 +28,7 @@ module Apiary
            if not test[:pass]
              error_block(test)
            end
-         }
+         }      
        end
 
        def error_block(test)

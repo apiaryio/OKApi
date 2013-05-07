@@ -2,6 +2,9 @@ module Apiary
   module Okapi
     module Outputs
       class BaseOutput
+
+        attr_reader :status
+
         def initialize(resources, error)
           @resources = resources
           @error = error
@@ -9,15 +12,15 @@ module Apiary
             :count => 0,
             :give_up => false,
           }
+          @status = true
           get_results
         end
 
-        def get          
-          p '------------------------------------------------------------------'
+        def get
           p @results[:count].to_s + ' tests'
           p @results[:give_up][:error].to_s if @results[:give_up]
           @results[:tests].each { |test|
-            p '########################################'
+            p '-------------------------------------------------'
             p test[:test_no]
             p test[:description]
             if test[:pass]
@@ -30,11 +33,11 @@ module Apiary
         end
 
         def get_results
-
           @results[:count] = @resources.count
           @results[:tests] = []
           if @error
             @results[:give_up] = {:error => @error}
+            @status = false
           else
             counter = 0
             @resources.each { |res|
@@ -42,7 +45,7 @@ module Apiary
               test_res = {
                 :test_no=> counter,
                 :pass => (res.validation_result.status and res.response.validation_result.status),
-                :description => res.method + ' ' + res.uri
+                :description => (res.method + ' ' + res.uri) + ((res.expanded_uri and res.uri != res.expanded_uri['url']) ? " (#{res.expanded_uri['url']}) " : '')
                 }
               if not test_res[:pass]
                 test_res[:exp] = {:request => {:pass => false}, :response => {:pass => false}}
@@ -50,12 +53,14 @@ module Apiary
                   test_res[:exp][:request][:pass] = true
                 else
                   test_res[:exp][:request][:reasons] = get_fail_result(res.validation_result)
+                  @status = false
                 end
 
                 if res.response.validation_result.status
                   test_res[:exp][:response][:pass] = true
                 else
                   test_res[:exp][:response][:reasons] = get_fail_result(res.response.validation_result)
+                  @status = false
                 end              
               end
             @results[:tests] << test_res

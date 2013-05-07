@@ -5,27 +5,28 @@ module Apiary
   module Okapi
     class Test
       def initialize(blueprint_path, test_spec_path, test_url, output, apiary_url)
-        @blueprint_path = blueprint_path || BLUEPRINT_PATH
-        @test_spec_path = test_spec_path || TEST_SPEC_PATH
-        @test_url       = test_url || TEST_URL
-        @output_format         = output || OUTPUT
-        @apiary_url     = apiary_url || APIARY_URL
+        @blueprint_path = blueprint_path
+        @test_spec_path = test_spec_path
+        @test_url       = test_url
+        @output_format  = output
+        @apiary_url     = apiary_url
         @req_path       = GET_REQUESTS_PATH
         @res_path       = GET_RESULTS_PATH
         @connector = Apiary::Okapi::ApiaryConnector.new(@apiary_url, @req_path, @res_path)
+        @proces_all_bp_resources = false
         @output = []
         @resources = []
-        @error = nil
-        
+        @error = nil        
       end
 
-      def run(test)
+      def run
         begin
           test()
         rescue Exception => e
+          p e
+          @resources = []
           @error = e
-        end
-        
+        end        
         Apiary::Okapi::Output.get(@output_format, @resources, @error)
       end
 
@@ -40,25 +41,30 @@ module Apiary
       end
 
       def prepare
-        resources = parse_test_spec(@test_spec_path)
-        
-        data = get_requests_spec(resources)
+        @resources = []
+        parser = get_test_spec_parser(@test_spec_path)
+        resources = parser.resources
+        counter = 0
 
-        raise Exception, 'Can not get request data from Apiary: ' + data[:error]  || '' if data[:error] or data[:resp].code.to_i != 200
+        resources.each { |res|
+          counter += 1
+          raise Exception, "Rresource not defined for item #{counter.to_d} in #{@test_spec_path}" unless res["resource"]
+          raise Exception, "Method not defined for resource #{res["resource"].to_s} in #{@test_spec_path}" unless res["method"]
+        }
+
+        @proces_all_bp_resources = parser.proces_all_bp_resources
+        data = get_requests_spec(resources, parser.global_vars)
+        
+        if data[:error] or data[:code] != 200
+          raise Exception, 'Can not get request data from Apiary: ' + data[:error] ? data[:error] : ''
+        end
          
         data[:data].each do |res|
           raise Exception, 'Resource error "' + res['error'] + '" for resource "' + res["method"] + ' ' + res["uri"]  + '"' if res['error']
-
-          resources.each do |resource|
-            if resource.uri == res["uri"] and resource.method == res["method"]
-              resource.expanded_uri = res["expandedUri"]
-              resource.body = res["body"]
-              resource.headers = res["headers"]
-              break
-            end
-          end
+          @resources << Apiary::Okapi::Resource.new(res["uri"], res["method"], res["params"], res["expandedUri"], res["headers"], res["body"])          
         end
-        @resources = resources
+
+        @resources      
       end
 
       def blueprint
@@ -87,9 +93,10 @@ module Apiary
       def evaluate
 
         data = @connector.get_results(@resources, blueprint)
-
-        raise Exception, 'Can not get evaluation data from apiary' + data[:error] || '' if data[:resp].code.to_i != 200 or data[:error]
-
+        if data[:error] or data[:code] != 200
+          raise Exception, 'Can not get evaluation data from apiary: ' + data[:error] ? data[:error] : ''
+        end
+        
         data[:data].each { |validation|
           @resources.each { |resource|
             if validation['resource']['uri'] == resource.uri and validation['resource']['method'] == resource.method
@@ -114,16 +121,19 @@ module Apiary
         }
       end      
 
-      def parse_test_spec(test_spec)
-        Apiary::Okapi::Parser.new(test_spec).resources
+      def get_test_spec_parser(test_spec)
+        Apiary::Okapi::Parser.new(test_spec)                
       end
 
       def parse_blueprint(blueprint_path)
+        if not File.exist? blueprint_path
+          raise Exception, "Blueprint file '#{blueprint_path}' not found"
+        end
         File.read(blueprint_path)
       end
 
-      def get_requests_spec(resources)
-        @connector.get_requests(resources, blueprint)
+      def get_requests_spec(resources, global_vars)
+        @connector.get_requests(resources, blueprint, @proces_all_bp_resources, global_vars)
       end
 
     end
