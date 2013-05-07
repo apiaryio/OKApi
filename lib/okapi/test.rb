@@ -23,7 +23,6 @@ module Apiary
         begin
           test()
         rescue Exception => e
-          p e
           @resources = []
           @error = e
         end        

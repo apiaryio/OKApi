@@ -58,8 +58,10 @@ module Apiary
           end
         rescue Errno::ENOENT  => e          
           puts "Config file (#{@options[:config_path]}) not accessible ... skiping"
+          puts "\n"
         rescue Exception => e
           puts "Config file (#{@options[:config_path]}) loading problem :#{e}"
+          puts "\n"
           exit 1
         end
       end
